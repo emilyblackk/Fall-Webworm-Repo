@@ -36,10 +36,15 @@ colnames(obs) <- c("id", "observed_on", "user_id", "latitude", "longitude",
   #Include observations with head capsule visible,
   #Filter out observations from western North America
 #only get dates after 2018
+#only get observations with a red or black colour
+#only get observations between latitudes 29-45
 #Remove NA values
 obs <- obs %>% dplyr::filter(head_capsule=="Yes", 
                              longitude>-100, 
-                             date>="2018-01-01") %>%
+                             date>="2018-01-01", 
+                             colour_morph %in% c("Black", "Red"), 
+                             latitude>=29, 
+                             latitude <=45)%>%
   na.omit()
 
 #Create latitude bands
@@ -61,3 +66,45 @@ abundances <- obs %>%
 
 
 #Get relative abundance of worms on each date 
+#Bring back year column
+abundances$year <-format(as.Date(abundances$date, format="%Y-%m-%d"), "%Y")
+#Add week column
+abundances$week <- format(abundances$date, format="%W/%Y")
+
+#generate summary table of webworm abundances per latitude band, year, and colour
+summary_table_weeks <- abundances %>%
+  group_by(colour_morph, latitude_band, week) %>%
+  summarize(week_count = n())
+summary_table_weeks$year <-format(as.Date(summary_table_weeks$week, format="%W/%Y"), "%Y")
+
+
+#generate summary table of webworm abundances per latitude band, year, and colour
+summary_table_year <- abundances %>%
+  group_by(colour_morph, latitude_band, year) %>%
+  summarize(total_count = n())
+
+#Use left-join to add total counts to each observation
+abundances_2 <- 
+  left_join(summary_table_weeks, summary_table_year,
+            by=c("year", "latitude_band", "colour_morph"))
+
+#Get relative abundance on each date
+abundances_2 <- abundances_2 %>%
+  mutate(rel_count=week_count/total_count)
+#Add date column for plotting
+
+
+#Part 3. Plot the Data
+plot <- abundances_2 %>%
+  filter(year==2020) %>%
+  ggplot(aes(x=week, y=rel_count))+
+  geom_point(aes(colour=colour_morph),position="jitter", alpha=0.5)+
+  facet_wrap(vars(latitude_band), nrow=4) +
+  ylim(0, 0.3)+
+  scale_color_manual(values = c("black", "#9C0260"))+
+  labs(x="Date", y="Observations")+
+  scale_linetype_manual(values=c("solid", "solid"))+
+  geom_smooth(aes(colour=colour_morph, linetype=colour_morph), method="loess", 
+              se=TRUE, fill="#34595E", span=0.25, lwd=2.5)+
+  theme_classic()
+plot
