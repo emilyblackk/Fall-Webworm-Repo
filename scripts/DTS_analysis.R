@@ -1,4 +1,6 @@
-#Perform DTS Analysis 
+#Perform DTS test on data
+
+
 #Emily Black
 #25 October 2022
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
@@ -11,7 +13,7 @@ rm(list=ls())
 
 #load relevant libraries for script
 pkgs <- c("tidyverse", "scales", "stats", "cowplot", "ggpmisc", "lubridate", 
-          "Matching", "gridExtra", "lme4", "twosamples", "envalysis", "ggpmisc")
+          "Matching", "gridExtra", "twosamples")
 #install.packages(pkgs)
 lapply(pkgs, library, character.only = TRUE)
 rm(pkgs)
@@ -20,7 +22,7 @@ rm(pkgs)
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 
 
-#Part 1. Prepare the data for DTS Analysis 
+#Part 1. Prepare the data for Survival Analysis 
 abundances_2 <- read.csv("mod_data/cleaned_weekly_obs_102322.csv")
 head(abundances_2)
 #Remove zone 4, not enough data
@@ -31,20 +33,12 @@ abundances_2 <- abundances_2 %>%
 #make sure dates read as date in file
 abundances_2$date <- as.Date(abundances_2$date)
 
-worms.lo <- loess(scaled_count~as.numeric(date), abundances_2)
-
-abundances_2 <- abundances_2 %>% 
-  group_by(colour_morph, growing_zone, year) %>%
-  mutate(smooth_y = predict(loess(scaled_count~as.numeric(date), span=0.05), 
-                            newdata=as.numeric(date))) 
-#make all negative values are 0
-abundances_2$smooth_y[abundances_2$smooth_y<0] <- 0
 
 #Get cumulative distribution functions
 #See cumulative density plots
 abundances_2 <- abundances_2 %>%
   group_by(year, colour_morph, growing_zone) %>%
-  mutate(csum = cumsum(smooth_y)/sum(smooth_y))
+  mutate(csum = cumsum(week_count)/sum(week_count))
 
 
 
@@ -119,7 +113,9 @@ plot_3
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 
-#Part 2. Perform DTS Analysis
+#Part 2. Testing The Cramer-von-Mis test on the data
+#Compare the distributions of the red and black from zone 5, year 2022
+
 
 set.seed(111)
 
@@ -164,11 +160,11 @@ dts_results <- rbind(dts_results, dts_test("2020", 7))
 dts_results <- rbind(dts_results, dts_test("2020", 8))
 dts_results <- rbind(dts_results, dts_test("2020", 9))
 
-colnames(dts_results) <- c("year", "growing_zone", "test_statistic", "p_value")
+
 #plot the results of the dts test
 generational_overlap_plots <- 
   dts_results %>%
-  ggplot(aes(x=as.numeric(growing_zone), y=(test_statistic), colour=year, group=year)) +
+  ggplot(aes(x=as.numeric(y), y=(test_statistic), colour=x, group=x)) +
   geom_point() +
   stat_summary(aes(y =(test_statistic),group=1), fun.y=mean, colour="Black", size=2,
                geom="line",group=1)+
@@ -181,65 +177,3 @@ generational_overlap_plots <-
     axis.title = element_text(size=12, face="bold"), 
     title=element_text(size=12, face="bold")) 
 generational_overlap_plots
-
-#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
-#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
-dts_results$growing_zone <- as.numeric(dts_results$growing_zone)
-dts_results$year <- as.character(dts_results$year)
-#add term with growing zone squared 
-dts_results <- dts_results %>%
-  mutate(growing_zone2 = growing_zone^2)
-
-#Part 3. Perform Regression Analysis 
-dts_model <-lm(test_statistic ~ growing_zone + growing_zone2 + year,
-                 data=dts_results)
-summary(dts_model)
-coef(dts_model)
-anova <- anova(dts_model)
-anova
-
-#Use colourblind friendly palette
-# The palette with grey:
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
-
-generational_overlap_plots_2 <- 
-  dts_results %>%
-  ggplot(aes(x=as.numeric(growing_zone), y=(test_statistic), colour=year, group=year)) +
-  geom_point(size=4) +
-  stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, 
-              se=FALSE, linetype="81")+
-  #geom_smooth(method="lm",show.legend=TRUE, se = FALSE, 
- # size=1, linetype="81")+
-  ylim(0,3)+
-  stat_poly_eq(method = "lm", formula = y ~ x + I(x^2))+
-  scale_colour_manual(values=cbPalette)+
-  labs(x="Growing Zone", y="Area between colour morph CDFs", colour="Year")+
-  theme_publish()+
-  theme(text = element_text(size=14), 
-        axis.text = element_text(size=12), 
-        legend.text = element_text(size=12))
-generational_overlap_plots_2
-
-ggsave("figures/dts_plot_quadratic.png", plot=generational_overlap_plots_2, 
-       width=3500, height=2800, units=c("px"), bg = "white")
-
-generational_overlap_plots_3 <- 
-  dts_results %>%
-  ggplot(aes(x=as.numeric(growing_zone), y=(test_statistic), colour=year, group=year)) +
-  geom_point(size=4) +
-  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, 
-             # se=FALSE, linetype="81")+
-  geom_smooth(method="lm",show.legend=TRUE, se = FALSE, 
-   size=1, linetype="81")+
-  ylim(0,3)+
-  stat_poly_eq()+
-  scale_colour_manual(values=cbPalette)+
-  labs(x="Growing Zone", y="Area between colour morph CDFs", colour="Year")+
-  theme_publish()+
-  theme(text = element_text(size=14), 
-        axis.text = element_text(size=12), 
-        legend.text = element_text(size=12))
-generational_overlap_plots_3
-ggsave("figures/dts_plot_linear.png", plot=generational_overlap_plots_3, 
-       width=3500, height=2800, units=c("px"), bg = "white")

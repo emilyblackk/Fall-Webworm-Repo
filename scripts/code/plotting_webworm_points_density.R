@@ -101,33 +101,72 @@ black_points <- points %>%
 red_points <- points %>%
   filter(colour_morph=="Red")
 
+#Make density plot from points - red
+red_points <- obs %>%
+  filter(colour_morph=="Red")
+#Turn into spatial points data frame
+xy <- red_points %>%
+  dplyr::select(longitude, latitude)
+
+#Make blank target raster
+target_rast <- rast(xmin=-130, xmax=-50, 
+                    ymin=25, ymax=50, 
+                    resolution=0.5, crs="EPSG:4326")
+
+#Rasterize the red points
+red_raster <- terra::rasterize(xy, raster(target_rast), fun="count", mask=FALSE)
+sum_raster_red <-cellStats(red_raster, 'sum')
+red_raster_props <- red_raster/sum_raster_red
+plot(red_raster_props)
+
+
+#Make density plot from points - black
+black_points <- obs %>%
+  filter(colour_morph=="Black")
+#Turn into spatial points data frame
+xy <- black_points %>%
+  dplyr::select(longitude, latitude)
+
+#Make blank target raster
+target_rast <- rast(xmin=-130, xmax=-50, 
+                    ymin=25, ymax=50, 
+                    resolution=1, crs="EPSG:4326")
+
+#Rasterize the black points
+black_raster <- terra::rasterize(xy, raster(target_rast), fun="count", mask=FALSE)
+sum_raster_black <-cellStats(black_raster, 'sum')
+black_raster_props <- black_raster/sum_raster_black
+plot(black_raster_props)
+
+
+
+
+
 tmap_mode("plot")
 zones_tmap_black <- tm_shape(zones_readin)+
-  tm_raster(palette="-RdYlBu", n=10, alpha=0.7, style="cat", title=
+  tm_raster(palette="-RdYlBu", n=10, alpha=0.5, style="cat", title=
               "Growing Zone", legend.show=TRUE)+
   tm_graticules(n.y=5, labels.size = 1, col="darkgrey", labels.show=c(FALSE, TRUE))+
-  tm_shape(black_points) + 
-  tm_symbols(col= "colour_morph",border.lwd=0, border.col="darkgrey",
-             palette=c(Black='black', Red="#9C0260"), size=0.2, border.alpha=0.5, 
-             title.col="Colour Morph", alpha=0.5)+
+  tm_shape(black_raster_props)+
+  tm_raster(palette="Greys", alpha=1, style="cont", title=
+              "Density of Black Morph Observations", legend.show=TRUE)+
   tm_legend(legend.outside=TRUE, legend.title.size=2, legend.text.size=1.5,
             legend.frame=TRUE)
 zones_tmap_black
 
+
 zones_tmap_red <- tm_shape(zones_readin)+
-  tm_raster(palette="-RdYlBu", n=10, alpha=0.7, style="cat", title=
-              "Growing Zone", legend.show=FALSE)+
-  tm_graticules(n.y = 5, labels.size = 1, col="darkgrey", labels.show=c(TRUE, TRUE))+
-  tm_shape(red_points) + 
-  tm_symbols(col= "colour_morph", 
-             palette=c(Black='black', Red="#9C0260"), size=0.2, border.col="black",
-             title.col="Colour Morph", alpha=0.5)+
-  tm_legend(legend.show=TRUE, aes.color = "#00000000" , legend.outside=TRUE, legend.text.color = "white", 
-            legend.title.color = "white", legend.title.size=2, legend.text.size=1.5)
+  tm_raster(palette="-RdYlBu", n=10, alpha=0.5, style="cat", title=
+              "Growing Zone", legend.show=TRUE)+
+  tm_graticules(n.y=5, labels.size = 1, col="darkgrey", labels.show=c(FALSE, TRUE))+
+  tm_shape(red_raster_props)+
+  tm_raster(palette="Reds", alpha=1, style="cont", title=
+              "Density of Red Morph Observations", legend.show=TRUE)+
+  tm_legend(legend.outside=TRUE, legend.title.size=2, legend.text.size=1.5,
+            legend.frame=TRUE)
 zones_tmap_red
-arrange <- tmap_arrange(zones_tmap_black, zones_tmap_red, ncol=1)
-arrange
 
 
-tmap_save(arrange, "figures/colour_morph_distribution.pdf", units="in", width=11, height=8.5)
+
+tmap_save(arrange, "figures/colour_morph_distribution_density.pdf", units="in", width=11, height=8.5)
 

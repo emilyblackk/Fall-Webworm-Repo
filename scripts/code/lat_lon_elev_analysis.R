@@ -226,9 +226,17 @@ sum.elev <- obs_elev_df %>%
                            sd_elev = sd(elevation))
 sum.elev
 
+# read in
+obs_elev_df <- read.csv("mod_data/observations_with_elevation.csv")
+
+obs_elev_df_2 <- obs_elev_df %>%
+  filter(coords.x1 < I(-100)
+         )
+
+table(obs_elev_df_2$colour_morph)
 
 #plot the data
-elev_plot <- obs_elev_df %>%
+elev_plot <- obs_elev_df_2 %>%
   ggplot(aes(x=as.factor(year), y=elevation, colour=colour_morph)) + 
   geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph))+
   scale_fill_manual(values = c("black", "#9C0260"))+
@@ -241,6 +249,10 @@ elev_plot <- obs_elev_df %>%
         legend.title=element_text(size=16), 
         legend.text = element_text(size=12))
 elev_plot
+
+elev.aov <- aov(elevation ~ colour_morph*year*coords.x2, data = obs_elev_df_2)
+summary(elev.aov)
+my.aov2 <- stepAIC(elev.aov)
 
 combined_plot <- grid.arrange(lat_plot, lon_plot, elev_plot, ncol=1)
 ggsave("figures/lat_lon_elev_distribution.pdf", combined_plot, 
