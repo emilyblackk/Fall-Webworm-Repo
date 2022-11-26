@@ -105,29 +105,31 @@ tmap_mode("plot")
 zones_tmap_black <- tm_shape(zones_readin)+
   tm_raster(palette="-RdYlBu", n=10, alpha=0.7, style="cat", title=
               "Growing Zone", legend.show=TRUE)+
-  tm_graticules(n.y=5, labels.size = 1, col="darkgrey", labels.show=c(FALSE, TRUE))+
+  tm_graticules(n.y=5, n.x = 7, labels.size = 1, col="darkgrey", labels.show=c(FALSE, TRUE))+
   tm_shape(black_points) + 
-  tm_symbols(col= "colour_morph",border.lwd=0, border.col="darkgrey",
-             palette=c(Black='black', Red="#9C0260"), size=0.2, border.alpha=0.5, 
-             title.col="Colour Morph", alpha=0.5)+
-  tm_legend(legend.outside=TRUE, legend.title.size=2, legend.text.size=1.5,
-            legend.frame=TRUE)
+  tm_symbols(col= "colour_morph", border.col="black",
+             palette=c(Black='black', Red="#9C0260"), size=0.15, border.alpha=0.5, 
+             title.col="Colour Morph", alpha=0.4)+
+  tm_legend(legend.show=FALSE, aes.color = "#00000000" , legend.outside=FALSE, legend.text.color = "white", 
+            legend.title.color = "white", legend.title.size=0.1, legend.text.size=0.1,legend.position=c("RIGHT", "BOTTOM") )
 zones_tmap_black
 
 zones_tmap_red <- tm_shape(zones_readin)+
   tm_raster(palette="-RdYlBu", n=10, alpha=0.7, style="cat", title=
-              "Growing Zone", legend.show=FALSE)+
-  tm_graticules(n.y = 5, labels.size = 1, col="darkgrey", labels.show=c(TRUE, TRUE))+
+              "Plant Hardiness
+Zone", legend.show=TRUE)+
+  tm_graticules(n.y = 5,  n.x = 7, labels.size = 1, col="darkgrey", labels.show=c(TRUE, TRUE))+
   tm_shape(red_points) + 
   tm_symbols(col= "colour_morph", 
-             palette=c(Black='black', Red="#9C0260"), size=0.2, border.col="black",
+             palette=c(Black='black', Red="#9C0260"), size=0.15, border.col="black",
+             border.lwd=0,
              title.col="Colour Morph", alpha=0.5)+
-  tm_legend(legend.show=TRUE, aes.color = "#00000000" , legend.outside=TRUE, legend.text.color = "white", 
-            legend.title.color = "white", legend.title.size=2, legend.text.size=1.5)
+  tm_legend(legend.outside=FALSE, legend.title.size=2, legend.text.size=1.5,
+            legend.frame=TRUE, legend.position=c("RIGHT", "BOTTOM"))
 zones_tmap_red
 arrange <- tmap_arrange(zones_tmap_black, zones_tmap_red, ncol=1)
 arrange
 
 
-tmap_save(arrange, "figures/colour_morph_distribution.pdf", units="in", width=11, height=8.5)
+tmap_save(arrange, "figures/colour_morph_distribution.pdf", units="px", width=3000, height=2300)
 

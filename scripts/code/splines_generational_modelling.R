@@ -179,26 +179,29 @@ abundances_2$growing_zone = factor(abundances_2$growing_zone,
                                  levels=c('4', '5', '6', '7', '8', '9'))
 plot <- abundances_2 %>%
   ggplot(aes(x=date, y=scaled_count, group=colour_morph))+
-  geom_point(aes(colour=colour_morph),position="jitter", alpha=0.5)+
+  geom_point(aes(colour=colour_morph), alpha=0.5, size=2)+
   facet_grid(rows=vars(growing_zone)) +
-  scale_y_continuous(sec.axis = sec_axis(~ . , name = "Growing zone", breaks = NULL, labels = NULL), 
+  scale_y_continuous(sec.axis = sec_axis(~ . , name = "Plant hardiness zone", breaks = NULL, labels = NULL), 
                     limits=(-0.05:1), breaks = seq(0, 1, by = 0.5)) +
   scale_color_manual(values = c("black", "#9C0260"))+
-  labs(x="Date", y="Relative abundance", colour="Colour morph")+
+  labs(x="Date", y="Larval abundance (scaled from 0 to 1)", colour="Colour morph")+
   scale_linetype_manual(values=c("solid", "solid"))+
   geom_smooth(aes(colour=colour_morph, linetype=colour_morph 
-                  ), method="loess", span=0.1, 
+                  ), method="loess", span=0.05, 
               show.legend=FALSE, se = FALSE, 
-              size=2)+
+              size=1.5)+
   guides(colour = guide_legend(override.aes = list(size=5)))+
   theme_publish()+
   theme(text = element_text(size=14), 
-        axis.text = element_text(size=12), 
-        legend.text = element_text(size=12))
+        axis.text = element_text(size=14), 
+        axis.title= element_text(size=16, face="bold"), 
+        legend.text = element_text(size=14), 
+        legend.title = element_text(size=14, face="bold"), 
+        strip.text= element_text(size = 14))
 plot
 
 
 #export the data
 #write.csv(abundances_2, "mod_data/cleaned_weekly_obs_110422.csv", row.names=FALSE)
-ggsave("figures/abundance_plot.png", plot=plot, 
-       width=3500, height=2800, units=c("px"), bg = "white")
+ggsave("figures/abundance_plot.pdf", plot=plot, 
+       width=2500, height=1800, units=c("px"), bg = "white")

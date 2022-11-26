@@ -31,20 +31,11 @@ abundances_2 <- abundances_2 %>%
 #make sure dates read as date in file
 abundances_2$date <- as.Date(abundances_2$date)
 
-worms.lo <- loess(scaled_count~as.numeric(date), abundances_2)
-
-abundances_2 <- abundances_2 %>% 
-  group_by(colour_morph, growing_zone, year) %>%
-  mutate(smooth_y = predict(loess(scaled_count~as.numeric(date), span=0.05), 
-                            newdata=as.numeric(date))) 
-#make all negative values are 0
-abundances_2$smooth_y[abundances_2$smooth_y<0] <- 0
-
 #Get cumulative distribution functions
 #See cumulative density plots
 abundances_2 <- abundances_2 %>%
   group_by(year, colour_morph, growing_zone) %>%
-  mutate(csum = cumsum(smooth_y)/sum(smooth_y))
+  mutate(csum = cumsum(scaled_count)/sum(scaled_count))
 
 
 
@@ -102,17 +93,26 @@ dts_dataset <- rbind(remove_first_last_zero("2020", "9"), dts_dataset)
 
 plot_3 <- dts_dataset %>%
   ggplot(aes(x=date, y=csum, group=colour_morph))+
-  geom_point(aes(colour=colour_morph),position="jitter", alpha=0.5)+
+  geom_point(aes(colour=colour_morph),position="jitter", alpha=0.5, size=2)+
   facet_grid(rows=vars(growing_zone)) +
-  ylim(0,1)+
+  scale_y_continuous(breaks = seq(0, 1, by = 0.5))+
   scale_color_manual(values = c("black", "#9C0260"))+
   #geom_line(aes(colour=colour_morph))+
-  labs(x="Date", y="Observations")+
+  labs(x="Date", y="Cumulative distribution of observations", group = "Colour morph")+
   scale_linetype_manual(values=c("solid", "solid"))+
-  geom_smooth(aes(colour=colour_morph, linetype=colour_morph 
-  ), method="loess", span=0.05)+
-  theme_classic()
+  geom_line(aes(colour=colour_morph, linetype=colour_morph), linewidth=0.5 )+
+  theme_publish()+
+  theme(text = element_text(size=14), 
+        axis.text = element_text(size=14), 
+        axis.title= element_text(size=16, face="bold"), 
+        legend.text = element_text(size=14), 
+        legend.title = element_text(size=14, face="bold"), 
+        strip.text= element_text(size = 14), 
+        legend.position = c(.1,.95))
 plot_3
+
+ggsave("figures/cdf_plot.pdf", plot=plot_3, 
+       width=2500, height=1800, units=c("px"), bg = "white")
 
 
 
@@ -191,12 +191,29 @@ dts_results <- dts_results %>%
   mutate(growing_zone2 = growing_zone^2)
 
 #Part 3. Perform Regression Analysis 
-dts_model <-lm(test_statistic ~ growing_zone + growing_zone2 + year,
+dts_results$year <- as.character(dts_results$year)
+dts_model_poly <-lm(test_statistic ~ growing_zone + growing_zone2 + year + growing_zone:year + 
+                      growing_zone2:year,
                  data=dts_results)
-summary(dts_model)
-coef(dts_model)
-anova <- anova(dts_model)
+summary(dts_model_poly)
+coef(dts_model_poly)
+anova <- anova(dts_model_poly)
 anova
+#Make table with f-values and p values
+variable_names <- rownames(anova)
+dts_model_values <- as.data.frame(anova, row.names=rownames(anova))
+dts_model_values <- cbind(variable_names, dts_model_values)
+write_csv(as.data.frame(dts_model_values), "mod_data/dts_regression_stats.csv")
+
+
+dts_model_linear <-lm(test_statistic ~ growing_zone + year,
+                 data=dts_results)
+anova_linear <- anova(dts_model_linear)
+anova_linear
+
+library(AICcmodavg)
+aictab(cand.set = list(dts_model_poly, dts_model_linear), modnames=c("poly", "linear"))
+#The polynomial model fits better according to the AIC
 
 #Use colourblind friendly palette
 # The palette with grey:
@@ -211,18 +228,22 @@ generational_overlap_plots_2 <-
               se=FALSE, linetype="81")+
   #geom_smooth(method="lm",show.legend=TRUE, se = FALSE, 
  # size=1, linetype="81")+
-  ylim(0,3)+
-  stat_poly_eq(method = "lm", formula = y ~ x + I(x^2))+
+  ylim(0,2.5)+
   scale_colour_manual(values=cbPalette)+
-  labs(x="Growing Zone", y="Area between colour morph CDFs", colour="Year")+
+  labs(x="Plant hardiness zone", y="Difference between cumulative distribution 
+functions of morphs", colour="Year")+
   theme_publish()+
   theme(text = element_text(size=14), 
-        axis.text = element_text(size=12), 
-        legend.text = element_text(size=12))
+        axis.text = element_text(size=14), 
+        axis.title= element_text(size=16, face="bold"), 
+        legend.text = element_text(size=14), 
+        legend.title = element_text(size=14, face="bold"), 
+        strip.text= element_text(size = 14), 
+        legend.position = c(.2,.85))
 generational_overlap_plots_2
 
-ggsave("figures/dts_plot_quadratic.png", plot=generational_overlap_plots_2, 
-       width=3500, height=2800, units=c("px"), bg = "white")
+ggsave("figures/dts_plot_quadratic.pdf", plot=generational_overlap_plots_2, 
+       width=2500, height=1800, units=c("px"), bg = "white")
 
 generational_overlap_plots_3 <- 
   dts_results %>%

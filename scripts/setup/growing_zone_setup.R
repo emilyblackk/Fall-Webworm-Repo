@@ -3,7 +3,14 @@
 #Assigning growing zones to fall webworm locations
 
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
+#_#
+
+
+
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
+#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
+
+_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 
 #Part 0. Setting up R environment and packages
 
@@ -15,13 +22,6 @@ pkgs <- c("tidyverse", "raster", "tmap", "terra", "rgdal", "sf", "stars")
 #install.packages(pkgs)
 lapply(pkgs, library, character.only = TRUE)
 rm(pkgs)
-
-
-
-#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
-#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
-
-
 #Part 1. Read in and clean data
 
 #NOTE: This is for growing zone setup. Uncomment this code if you 
