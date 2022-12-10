@@ -1,1 +1,0 @@
-#This folder contains scripts used to set up the Fall Webworm repository, and to clean data, generate figures, and investigate our hypothesis. 
