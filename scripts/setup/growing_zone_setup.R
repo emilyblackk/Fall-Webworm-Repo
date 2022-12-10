@@ -10,7 +10,7 @@
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 
-_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
+#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 
 #Part 0. Setting up R environment and packages
 
@@ -109,8 +109,11 @@ zones_tmap
 
 
 #Assign zones to fall webworm observations
-obs <- read.csv("raw_data/110422_raw_data.csv")
+obs <- read.csv("raw_data/120222_raw_data.csv")
 head(obs)
+obs <- obs %>%
+  dplyr::select(id, observed_on, user_id, latitude, longitude, field.colour, 
+         field.head.capsule.visible.)
 
 coordinates <- obs %>%
   dplyr::select(longitude, latitude)

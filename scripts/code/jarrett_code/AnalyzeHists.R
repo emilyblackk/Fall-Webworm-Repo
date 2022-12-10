@@ -118,15 +118,23 @@ group.colours = c(Black = "#000000", Red = "#9C0260") #Plot LD1 vs latitude for 
 linear_plot <- ggplot(data = FinalDF, aes(x = as.numeric(as.character(growing_zones)), y = LD1, 
                                           colour = field.colour, linetype=as.character(year)))+
   #geom_point(aes(colour = field.colour, shape=as.character(year)))+
-  geom_smooth(aes(colour=field.colour), method = "lm", fill = "#34595E", level=0.95, 
-              lwd=1.5, alpha=0.3)+
+  geom_smooth(aes(colour=field.colour), method = "lm", fill = "#000000", 
+              level=0.95, 
+              lwd=1.5, alpha=0.15)+
+  stat_summary(aes(shape=as.character(year), colour=field.colour),
+               fill="black",
+    geom = "point",
+    fun.y = "mean",
+    size = 4, 
+    stroke=1.5)+
   coord_cartesian(xlim = c(5,9),
                   ylim = c(-1,2.5))+
   xlab("Plant hardiness zone")+
   ylab("Linear discriminant 1")+
-  labs(color="Colour morph", linetype="Year")+
+  labs(color="Colour morph", linetype="Year", shape="Mean LD1")+
   #facet_wrap(vars(year))+
   #geom_vline(xintercept = 41, linetype = "dotted") +
+  scale_shape_manual(name = "Year", values = c(1, 5, 4))+
   scale_color_manual(values = c("#000000", "#9C0260"))+
   scale_fill_manual(values = c("#000000", "#9C0260"))+
   scale_linetype_manual(values = c("solid", "longdash", "dotdash"))+

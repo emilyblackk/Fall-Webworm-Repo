@@ -158,7 +158,7 @@ summary_table_weeks <- abundances_complete %>%
 abundances_2 <- summary_table_weeks %>%
 group_by(colour_morph, growing_zone, year) %>%
   mutate(scaled_count = 
-           rescale(week_count, to = c(0, 1), from = range(week_count)))
+           scales::rescale(week_count, to = c(0, 1), from = range(week_count)))
 #Add date column for plotting
 abundances_2$date <- lubridate::ymd("2018-01-01") + lubridate::weeks(abundances_2$week - 1) + 
   lubridate::years(as.numeric(abundances_2$year) - 2018)
@@ -184,7 +184,7 @@ plot <- abundances_2 %>%
   scale_y_continuous(sec.axis = sec_axis(~ . , name = "Plant hardiness zone", breaks = NULL, labels = NULL), 
                     limits=(-0.05:1), breaks = seq(0, 1, by = 0.5)) +
   scale_color_manual(values = c("black", "#9C0260"))+
-  labs(x="Date", y="Larval abundance (scaled from 0 to 1)", colour="Colour morph")+
+  labs(x="Date", y="Weekly larval abundance (scaled from 0 to 1)", colour="Colour morph")+
   scale_linetype_manual(values=c("solid", "solid"))+
   geom_smooth(aes(colour=colour_morph, linetype=colour_morph 
                   ), method="loess", span=0.05, 
@@ -197,11 +197,12 @@ plot <- abundances_2 %>%
         axis.title= element_text(size=16, face="bold"), 
         legend.text = element_text(size=14), 
         legend.title = element_text(size=14, face="bold"), 
-        strip.text= element_text(size = 14))
+        strip.text= element_text(size = 14), 
+        legend.position = c(0.10, 0.92))
 plot
 
 
 #export the data
-#write.csv(abundances_2, "mod_data/cleaned_weekly_obs_110422.csv", row.names=FALSE)
+#write.csv(abundances_2, "mod_data/cleaned_weekly_obs_120222.csv", row.names=FALSE)
 ggsave("figures/abundance_plot.pdf", plot=plot, 
        width=2500, height=1800, units=c("px"), bg = "white")

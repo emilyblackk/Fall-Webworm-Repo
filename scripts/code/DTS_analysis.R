@@ -21,7 +21,7 @@ rm(pkgs)
 
 
 #Part 1. Prepare the data for DTS Analysis 
-abundances_2 <- read.csv("mod_data/cleaned_weekly_obs_102322.csv")
+abundances_2 <- read.csv("mod_data/cleaned_weekly_obs_120222.csv")
 head(abundances_2)
 #Remove zone 4, not enough data
 abundances_2 <- abundances_2 %>%
@@ -203,17 +203,23 @@ anova
 variable_names <- rownames(anova)
 dts_model_values <- as.data.frame(anova, row.names=rownames(anova))
 dts_model_values <- cbind(variable_names, dts_model_values)
+
+
+dts_model_linear <-lm(test_statistic ~ growing_zone + year + 
+                        growing_zone:year,
+                 data=dts_results)
+summary(dts_model_linear)
+anova_linear <- anova(dts_model_linear)
+anova_linear
+variable_names <- rownames(anova_linear)
+dts_model_values <- as.data.frame(anova_linear, row.names=rownames(anova_linear))
+dts_model_values <- cbind(variable_names, dts_model_values)
 write_csv(as.data.frame(dts_model_values), "mod_data/dts_regression_stats.csv")
 
 
-dts_model_linear <-lm(test_statistic ~ growing_zone + year,
-                 data=dts_results)
-anova_linear <- anova(dts_model_linear)
-anova_linear
-
 library(AICcmodavg)
 aictab(cand.set = list(dts_model_poly, dts_model_linear), modnames=c("poly", "linear"))
-#The polynomial model fits better according to the AIC
+#The linear model fits better according to the AIC
 
 #Use colourblind friendly palette
 # The palette with grey:
@@ -249,18 +255,20 @@ generational_overlap_plots_3 <-
   dts_results %>%
   ggplot(aes(x=as.numeric(growing_zone), y=(test_statistic), colour=year, group=year)) +
   geom_point(size=4) +
-  #stat_smooth(method = "lm", formula = y ~ x + I(x^2), size = 1, 
-             # se=FALSE, linetype="81")+
   geom_smooth(method="lm",show.legend=TRUE, se = FALSE, 
    size=1, linetype="81")+
   ylim(0,3)+
-  stat_poly_eq()+
   scale_colour_manual(values=cbPalette)+
-  labs(x="Growing Zone", y="Area between colour morph CDFs", colour="Year")+
+  labs(x="Plant hardiness zone", y="Difference between cumulative distribution 
+functions of morphs", colour="Year")+
   theme_publish()+
   theme(text = element_text(size=14), 
-        axis.text = element_text(size=12), 
-        legend.text = element_text(size=12))
+        axis.text = element_text(size=14), 
+        axis.title= element_text(size=16, face="bold"), 
+        legend.text = element_text(size=14), 
+        legend.title = element_text(size=14, face="bold"), 
+        strip.text= element_text(size = 14), 
+        legend.position = c(.2,.85))
 generational_overlap_plots_3
-ggsave("figures/dts_plot_linear.png", plot=generational_overlap_plots_3, 
-       width=3500, height=2800, units=c("px"), bg = "white")
+ggsave("figures/dts_plot_linear.pdf", plot=generational_overlap_plots_3, 
+       width=2500, height=1800, units=c("px"), bg = "white")

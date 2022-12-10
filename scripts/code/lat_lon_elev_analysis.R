@@ -53,7 +53,8 @@ table(obs$year, obs$growing_zone)
 obs <- obs %>% dplyr::filter(head_capsule=="Yes", 
                              date>="2018-01-01", 
                              colour_morph %in% c("Black", "Red"), 
-                             year<=2020, longitude>-100)%>%
+                             year<=2020, 
+                             longitude>-100)%>%
   na.omit()
 
 
@@ -136,9 +137,10 @@ TukeyHSD(lat.aov)
 #plot the data
 lat_plot <- obs %>%
   ggplot(aes(x=as.factor(year), y=latitude, colour=colour_morph)) + 
-  geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph), show.legend = FALSE)+
+  geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph))+
   scale_fill_manual(values = c("black", "#9C0260"))+
   scale_colour_manual(values = c("black", "#9C0260"))+
+  ylim(25, 60)+
   guides(colour="none")+
   labs(x="Year", y="Latitude (°N)", fill="Colour morph") + 
   theme_publish()+
@@ -150,7 +152,8 @@ lat_plot <- obs %>%
         strip.text= element_text(size = 14), 
         axis.title.x=element_blank(),
         axis.text.x=element_blank(),
-        axis.ticks.x=element_blank())
+        axis.ticks.x=element_blank(), 
+        legend.position = c(0.90, 0.85))
 lat_plot
 
 
@@ -189,7 +192,8 @@ TukeyHSD(lon.aov)
 #plot the data
 lon_plot <- obs %>%
   ggplot(aes(x=as.factor(year), y=longitude, colour=colour_morph)) + 
-  geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph), show.legend = FALSE)+
+  geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph)
+              , show.legend = FALSE)+
   scale_fill_manual(values = c("black", "#9C0260"))+
   scale_colour_manual(values = c("black", "#9C0260"))+
   guides(colour="none")+
@@ -303,7 +307,8 @@ table(obs_elev_df_2$colour_morph)
 
 elev_plot <- obs_elev_df_2 %>%
   ggplot(aes(x=as.factor(year), y=elevation, colour=colour_morph)) + 
-  geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph))+
+  geom_violin(trim=TRUE, adjust = .5, aes(fill = colour_morph, colour=colour_morph), 
+              show.legend=FALSE)+
   scale_fill_manual(values = c("black", "#9C0260"))+
   scale_colour_manual(values = c("black", "#9C0260"))+
   guides(colour="none")+
@@ -315,9 +320,10 @@ morph") +
         axis.title= element_text(size=16, face="bold"), 
         legend.text = element_text(size=14), 
         legend.title = element_text(size=14, face="bold"), 
-        strip.text= element_text(size = 14), 
-        legend.position = c(0.95, 0.75))
+        strip.text= element_text(size = 14))
 elev_plot
+
+
 
 elev.aov <- aov(elevation ~ colour_morph*year*coords.x2, data = obs_elev_df_2)
 summary(elev.aov)
@@ -330,9 +336,11 @@ combined_plot_2
 
 ggsave("figures/lat_lon_elev_distribution.pdf", combined_plot_2, 
        width=2500, height=1800, units=c("px"))
+#ggsave("figures/lat_lon_elev_distribution.svg", combined_plot_2, 
+      # width=2500, height=1800, units=c("px"))
 
 #Save the elevation data
-write.csv(obs_elev_df, "mod_data/observations_with_elevation.csv")
+#write.csv(obs_elev_df, "mod_data/observations_with_elevation.csv")
 
 
 

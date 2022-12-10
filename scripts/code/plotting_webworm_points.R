@@ -74,6 +74,7 @@ obs %>%
 #Only 4-9 contain a sufficient number of observations
 
 
+
 #Cleaning the data: 
 #Include observations with head capsule visible,
 #Filter out observations from western North America
@@ -125,7 +126,7 @@ Zone", legend.show=TRUE)+
              border.lwd=0,
              title.col="Colour Morph", alpha=0.5)+
   tm_legend(legend.outside=FALSE, legend.title.size=2, legend.text.size=1.5,
-            legend.frame=TRUE, legend.position=c("RIGHT", "BOTTOM"))
+            legend.frame=TRUE, legend.position=c("right", "bottom"))
 zones_tmap_red
 arrange <- tmap_arrange(zones_tmap_black, zones_tmap_red, ncol=1)
 arrange

@@ -1,7 +1,0 @@
-Variable,variable_names,Df,Sum Sq,Mean Sq,F value,Pr(>F)
-Plant hardiness zone,plant_hardiness_zone,1,2.617238755,2.617238755,65.77621464,1.89E-04
-Plant hardiness zone (squared),plant_hardiness_zone2,1,0.649942917,0.649942917,16.33430833,0.00679061
-Year ,year,2,0.126601041,0.06330052,1.590863122,0.279049168
-Plant hardiness zone by year,plant_hardiness_zone:year,2,0.02176362,0.01088181,0.2734807,0.769722905
-Plant hardiness zone (squared) by year,plant_hardiness_zone2:year,2,0.009280535,0.004640268,0.1166188,0.891892898
-Residuals,Residuals,6,0.23874029,0.039790048,NA,NA
