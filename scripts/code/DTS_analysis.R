@@ -93,14 +93,16 @@ dts_dataset <- rbind(remove_first_last_zero("2020", "9"), dts_dataset)
 
 plot_3 <- dts_dataset %>%
   ggplot(aes(x=date, y=csum, group=colour_morph))+
-  geom_point(aes(colour=colour_morph),position="jitter", alpha=0.5, size=2)+
+  geom_point(aes(colour=colour_morph, group=as.character(year)), alpha=0.5, size=2)+
   facet_grid(rows=vars(growing_zone)) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.5))+
+  scale_y_continuous(sec.axis = sec_axis(~ . , name = "Plant hardiness zone", breaks = NULL, labels = NULL), 
+                     breaks = seq(0, 1, by = 0.5)) +
   scale_color_manual(values = c("black", "#9C0260"))+
   #geom_line(aes(colour=colour_morph))+
-  labs(x="Date", y="Cumulative distribution of observations", group = "Colour morph")+
+  labs(x="Date", y="Cumulative distribution of observations", colour = "Colour morph")+
   scale_linetype_manual(values=c("solid", "solid"))+
-  geom_line(aes(colour=colour_morph, linetype=colour_morph), linewidth=0.5 )+
+  geom_line(aes(colour=colour_morph, group=interaction(colour_morph, year)), 
+            linewidth=0.75 )+
   theme_publish()+
   theme(text = element_text(size=14), 
         axis.text = element_text(size=14), 
