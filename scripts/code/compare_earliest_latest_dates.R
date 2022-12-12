@@ -141,10 +141,12 @@ compare_earliest_plot <- earliest_date_summary %>%
     geom_errorbar(aes(ymin =(mean_yday - se), ymax = (mean_yday+se)), 
                   width=0.25, show.legend=FALSE, linewidth=1, linetype="solid")+
   scale_color_manual(values = c("black", "#9C0260"))+
-  annotate("text", x=9.2, y=200, label= "B", size=10)+
-  labs(x="Plant hardiness zone", y="First 10%
-  of observation dates", colour="Colour morph", 
+  annotate("text", x=4.6, y=200, label= "A", size=10)+
+  labs(x="Plant hardiness zone", y="Earliest 10% of 
+   observations (Julian day)", colour="Colour morph", 
       )+
+  coord_flip()+
+  scale_x_reverse()+
 theme_publish()+
   theme(text = element_text(size=14), 
         axis.text = element_text(size=14), 
@@ -231,7 +233,6 @@ latest_lm <- lm(julian_day~colour_morph + colour_morph:growing_zone +
 coef(latest_lm)
 latest_aov <- aov(latest_lm)
 summary(latest_aov)
-stats::TukeyHSD(latest_aov)
 
 
 compare_latest_plot <- latest_date_summary %>%
@@ -240,25 +241,27 @@ compare_latest_plot <- latest_date_summary %>%
   geom_point(aes(colour = colour_morph), size=4)+
   geom_line(aes(colour=colour_morph), fill = "#34595E", level=0.95, 
             lwd=1.5, alpha=0.3, se=FALSE, show.legend=FALSE)+
-  ylim(230, 350)+
+   scale_y_continuous(limits = c(210, 330), breaks = seq(210, 330, by = 30))+
   geom_errorbar(aes(ymin =(mean_yday - se), ymax = (mean_yday+se)), 
                 width=0.25, show.legend=FALSE, linewidth=1, linetype="solid")+
   scale_color_manual(values = c("black", "#9C0260"))+
-  annotate("text", x=9.2, y=345, label= "A", size=10)+
-  labs(x="Plant hardiness zone", y="Last 10%
-   of observation dates", colour="Colour morph", 
+  annotate("text", x=4.6, y=315, label= "B", size=10)+
+  labs(x="Plant hardiness zone", y="Latest 10% of 
+  observations (Julian day)", colour="Colour morph", 
   )+
+  coord_flip()+
+  scale_x_reverse()+
   theme_publish()+
   theme(text = element_text(size=14), 
         legend.text = element_text(size=14), 
         legend.title = element_text(size=14, face="bold"), 
         axis.title= element_text(size=16, face="bold"), 
         axis.text = element_text(size=14), 
-        legend.position = c(0.80, 0.85), 
-        strip.text= element_text(size = 14), 
-        axis.title.x=element_blank(),
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
+        legend.position = c(0.85, 0.80), 
+        strip.text= element_text(size = 14),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank()
   )
 compare_latest_plot   
 
@@ -281,8 +284,8 @@ compare_latest_plot
 #         legend.title = element_text(size=14, face="bold"), 
 #         strip.text= element_text(size = 14))
 
-combined_plot_2 <- plot_grid(compare_latest_plot , compare_earliest_plot, ncol = 1, 
-                             align = "v")
+combined_plot_2 <- plot_grid(compare_earliest_plot, compare_latest_plot , ncol = 2, 
+                             align = "h")
                              
 combined_plot_2
   
