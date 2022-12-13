@@ -225,7 +225,7 @@ aictab(cand.set = list(dts_model_poly, dts_model_linear), modnames=c("poly", "li
 
 #Use colourblind friendly palette
 # The palette with grey:
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+cbPalette <- c("#000000", "#0072B2", "#D55E00", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 
 generational_overlap_plots_2 <- 
@@ -270,7 +270,7 @@ functions of morphs", colour="Year")+
         legend.text = element_text(size=14), 
         legend.title = element_text(size=14, face="bold"), 
         strip.text= element_text(size = 14), 
-        legend.position = c(.2,.85))
+        legend.position = c(.85,.85))
 generational_overlap_plots_3
 ggsave("figures/dts_plot_linear.pdf", plot=generational_overlap_plots_3, 
        width=2500, height=1800, units=c("px"), bg = "white")
