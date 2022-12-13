@@ -145,7 +145,7 @@ linear_plot <- ggplot(data = FinalDF, aes(x = as.numeric(as.character(growing_zo
         legend.text = element_text(size=14), 
         legend.title = element_text(size=14, face="bold"), 
         strip.text= element_text(size = 14), 
-        legend.position = c(0.4, 0.90),
+        legend.position = c(0.75, 0.90),
         legend.key.width=unit(2,"cm"))
 linear_plot
 
