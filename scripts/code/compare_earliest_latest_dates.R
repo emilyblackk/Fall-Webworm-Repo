@@ -122,7 +122,8 @@ mean_diff_earliest <- compare_earliest %>%
   group_by(colour_morph) %>%
   summarize(mean = mean(julian_day))
 mean_diff_earliest
-sd_pooled(julian_day~colour_morph, data=compare_earliest)
+t.test_earliest <- t.test(julian_day~colour_morph, data=compare_earliest)
+conf.int.earliest <- t.test_earliest$conf.int
 
 #Anova for earliest dates
 compare_earliest$growing_zone <- as.numeric(compare_earliest$growing_zone)
@@ -248,7 +249,9 @@ mean_diff_latest <- compare_latest %>%
   group_by(colour_morph) %>%
   summarize(mean = mean(julian_day))
 mean_diff_latest
-sd_pooled(julian_day~colour_morph, data=compare_latest)
+t.test_latest <- t.test(julian_day~colour_morph, data=compare_latest)
+conf.int.latest <- t.test_latest$conf.int
+stderr_latest <- t.test_latest$stderr
 
 #Anova for latest dates
 compare_latest$growing_zone <- as.numeric(compare_latest$growing_zone)
