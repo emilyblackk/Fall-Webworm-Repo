@@ -8,7 +8,8 @@ rm(list=ls())
 
 #load relevant libraries for script
 pkgs <- c("tidyverse", "scales", "stats", "cowplot", "ggpmisc", "lubridate", 
-          "Matching", "gridExtra", "elevatr", "envalysis", "broom", "effectsize")
+          "Matching", "gridExtra", "elevatr", "envalysis", "broom", "effectsize", 
+          "tidyquant")
 #install.packages(pkgs)
 lapply(pkgs, library, character.only = TRUE)
 rm(pkgs)
@@ -109,6 +110,13 @@ earliest_date_summary <- compare_earliest %>%
             se = sd_yday/sqrt(n_yday))
 earliest_date_summary
 
+#Get dates table
+earliest_date_summary <- earliest_date_summary %>%
+  mutate(mean_date = as.Date(mean_yday,    # Convert Julian day to date
+                                        origin = as.Date("2021-01-01")), 
+         lower_se = mean_date-se, 
+         upper_se = mean_date+se)
+
 #Earliest date stats
 mean_diff_earliest <- compare_earliest %>%
   group_by(colour_morph) %>%
@@ -130,30 +138,43 @@ earliest_aov
 #Plot the data
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
+#Add function to reverse dates on plot
+
+#Try to flip date axis
+coord_y_datetime <- function(xlim = NULL, ylim = NULL, expand = TRUE) {
+  if (!is.null(ylim)) {
+    ylim <- lubridate::as_date(ylim)
+  }
+  ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = expand)
+}
 
 compare_earliest_plot <- earliest_date_summary %>%
-  ggplot(aes(x=as.numeric(growing_zone), y=mean_yday, colour=as.factor(colour_morph), 
-             linetype = colour_morph))+
-  geom_point(aes(colour = colour_morph), size=4, show.legend=FALSE)+
-  ylim(90, 210)+
+  ggplot(aes(x=as.numeric(growing_zone), y=as.Date(mean_date), colour=as.factor(colour_morph), 
+             ))+
+  geom_point(aes(colour = colour_morph), size=4, show.legend=TRUE)+
   geom_line(aes(colour=colour_morph), fill = "#34595E", level=0.95, 
-              lwd=1.5, alpha=0.3, se=FALSE, show.legend=FALSE)+
-    geom_errorbar(aes(ymin =(mean_yday - se), ymax = (mean_yday+se)), 
+              lwd=1.5, alpha=0.3, se=FALSE, show.legend=FALSE, linetype = "dashed")+
+    geom_errorbar(aes(ymin =lower_se, ymax = upper_se), 
                   width=0.25, show.legend=FALSE, linewidth=1, linetype="solid")+
   scale_color_manual(values = c("black", "#9C0260"))+
-  annotate("text", x=4.6, y=200, label= "A", size=10)+
+  annotate("text", x=9, y=as.Date("3/15/2021", format="%m/%d/%Y"), label= "A", size=10)+
+  coord_y_datetime(ylim = c(max(as.Date(earliest_date_summary$mean_date)+15), 
+                            min(as.Date(earliest_date_summary$mean_date)-30)))+
   labs(x="Plant hardiness zone", y="Earliest 10% of 
-   observations (Julian day)", colour="Colour morph", 
+   observations", colour="Colour morph", 
       )+
-  coord_flip()+
-  scale_x_reverse()+
 theme_publish()+
   theme(text = element_text(size=14), 
         axis.text = element_text(size=14), 
         axis.title= element_text(size=16, face="bold"), 
         legend.text = element_text(size=14), 
         legend.title = element_text(size=14, face="bold"), 
-        strip.text= element_text(size = 14))
+        strip.text= element_text(size = 14),
+axis.title.x=element_blank(),
+axis.text.x=element_blank(),
+axis.ticks.x=element_blank(), 
+legend.position = c(0.80, 0.90) 
+  )
 compare_earliest_plot   
 
 
@@ -215,6 +236,11 @@ latest_date_summary <- compare_latest %>%
             n_yday = n(), 
             se = sd_yday/sqrt(n_yday))
 latest_date_summary
+latest_date_summary <- latest_date_summary %>%
+  mutate(mean_date = as.Date(mean_yday,    # Convert Julian day to date
+                             origin = as.Date("2021-01-01")), 
+         lower_se = mean_date-se, 
+         upper_se = mean_date+se)
 
 
 #latest date stats
@@ -236,21 +262,20 @@ summary(latest_aov)
 
 
 compare_latest_plot <- latest_date_summary %>%
-  ggplot(aes(x=as.numeric(growing_zone), y=mean_yday, colour=as.factor(colour_morph), 
-             linetype = colour_morph))+
-  geom_point(aes(colour = colour_morph), size=4)+
+  ggplot(aes(x=as.numeric(growing_zone), y=as.Date(mean_date), colour=as.factor(colour_morph)
+             ))+
+  geom_point(aes(colour = colour_morph), size=4, show.legend=FALSE)+
   geom_line(aes(colour=colour_morph), fill = "#34595E", level=0.95, 
-            lwd=1.5, alpha=0.3, se=FALSE, show.legend=FALSE)+
-   scale_y_continuous(limits = c(210, 330), breaks = seq(210, 330, by = 30))+
-  geom_errorbar(aes(ymin =(mean_yday - se), ymax = (mean_yday+se)), 
+            lwd=1.5, alpha=0.3, se=FALSE, show.legend=FALSE, linetype="dashed")+
+  geom_errorbar(aes(ymin =lower_se, ymax = upper_se), 
                 width=0.25, show.legend=FALSE, linewidth=1, linetype="solid")+
   scale_color_manual(values = c("black", "#9C0260"))+
-  annotate("text", x=4.6, y=315, label= "B", size=10)+
+  annotate("text", x=9, y=as.Date("9/1/2021", format="%m/%d/%Y"), label= "B", size=10)+
+  coord_y_datetime(ylim = c(max(as.Date(latest_date_summary$mean_date)+30), 
+                            min(as.Date(latest_date_summary$mean_date)-30)))+
   labs(x="Plant hardiness zone", y="Latest 10% of 
-  observations (Julian day)", colour="Colour morph", 
+  observations", colour="Colour morph", 
   )+
-  coord_flip()+
-  scale_x_reverse()+
   theme_publish()+
   theme(text = element_text(size=14), 
         legend.text = element_text(size=14), 
@@ -258,10 +283,7 @@ compare_latest_plot <- latest_date_summary %>%
         axis.title= element_text(size=16, face="bold"), 
         axis.text = element_text(size=14), 
         legend.position = c(0.85, 0.80), 
-        strip.text= element_text(size = 14),
-        axis.title.y=element_blank(),
-        axis.text.y=element_blank(),
-        axis.ticks.y=element_blank()
+        strip.text= element_text(size = 14)
   )
 compare_latest_plot   
 
@@ -284,8 +306,8 @@ compare_latest_plot
 #         legend.title = element_text(size=14, face="bold"), 
 #         strip.text= element_text(size = 14))
 
-combined_plot_2 <- plot_grid(compare_earliest_plot, compare_latest_plot , ncol = 2, 
-                             align = "h")
+combined_plot_2 <- plot_grid(compare_earliest_plot, compare_latest_plot , ncol = 1, 
+                             align = "v", rel_heights=c(1,1.15))
                              
 combined_plot_2
   
