@@ -7,7 +7,7 @@ rm(list=ls())
 
 #load relevant libraries for script
 pkgs <- c("tidyverse", "raster", "tmap", "terra", "rgdal", "sf", "stars", "smoothr")
-#install.packages(pkgs)
+install.packages(pkgs)
 lapply(pkgs, library, character.only = TRUE)
 rm(pkgs)
 
