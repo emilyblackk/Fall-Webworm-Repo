@@ -10,9 +10,9 @@ rm(list=ls())
 pkgs <- c("tidyverse", "scales", "stats", "cowplot", "ggpmisc", "lubridate", 
           "Matching", "gridExtra", "elevatr", "envalysis", "broom", "effectsize", 
           "tidyquant")
-#install.packages(pkgs)
+install.packages(pkgs)
 lapply(pkgs, library, character.only = TRUE)
-rm(pkgs)
+#rm(pkgs)
 
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
 #_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_#_
@@ -158,7 +158,7 @@ compare_earliest_plot <- earliest_date_summary %>%
     geom_errorbar(aes(ymin =lower_se, ymax = upper_se), 
                   width=0.25, show.legend=FALSE, linewidth=1, linetype="solid")+
   scale_color_manual(values = c("black", "#9C0260"))+
-  annotate("text", x=9, y=as.Date("3/15/2021", format="%m/%d/%Y"), label= "A", size=10)+
+  annotate("text", x=9, y=as.Date("3/15/2021", format="%m/%d/%Y"), label= "a", size=10)+
   coord_y_datetime(ylim = c(max(as.Date(earliest_date_summary$mean_date)+15), 
                             min(as.Date(earliest_date_summary$mean_date)-30)))+
   labs(x="Plant hardiness zone", y="Earliest 10% of 
@@ -273,7 +273,7 @@ compare_latest_plot <- latest_date_summary %>%
   geom_errorbar(aes(ymin =lower_se, ymax = upper_se), 
                 width=0.25, show.legend=FALSE, linewidth=1, linetype="solid")+
   scale_color_manual(values = c("black", "#9C0260"))+
-  annotate("text", x=9, y=as.Date("9/1/2021", format="%m/%d/%Y"), label= "B", size=10)+
+  annotate("text", x=9, y=as.Date("9/1/2021", format="%m/%d/%Y"), label= "b", size=10)+
   coord_y_datetime(ylim = c(max(as.Date(latest_date_summary$mean_date)+30), 
                             min(as.Date(latest_date_summary$mean_date)-30)))+
   labs(x="Plant hardiness zone", y="Latest 10% of 
