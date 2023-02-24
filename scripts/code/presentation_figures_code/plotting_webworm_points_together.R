@@ -126,7 +126,7 @@ borders_tmap_red <- tm_shape(north_america, bbox=points)+
   tm_graticules(n.y = 5,  n.x = 7, labels.size = 1, col="darkgrey", labels.show=c(TRUE, TRUE))+
   tm_shape(red_points) + 
   tm_symbols(col= "colour_morph", 
-             palette=c(Black='black', Red="#9C0260"), size=0.15, border.col="black",
+             palette=c(Black='black', Red="#9C0260"), size=0.15, border.col="#9C0260",
              border.lwd=0,
              title.col="Colour Morph", alpha=0.5)+
   tm_legend(legend.outside=FALSE, legend.title.size=2, legend.text.size=1.5,
@@ -137,7 +137,7 @@ arrange_borders <- tmap_arrange(borders_tmap_black, borders_tmap_red, ncol=1)
 arrange_borders
 
 
-tmap_save(arrange_borders, "figures_for_presentations/colour_morph_distribution_nozones.pdf", units="px", width=3000, height=2300)
+tmap_save(arrange_borders, "figures_for_presentations/colour_morph_distribution_nozones.jpg", units="px", width=3000, height=2300)
 
 
 

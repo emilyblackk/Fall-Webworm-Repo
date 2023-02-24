@@ -274,3 +274,30 @@ functions of morphs", colour="Year")+
 generational_overlap_plots_3
 ggsave("figures/dts_plot_linear.pdf", plot=generational_overlap_plots_3, 
        width=2500, height=1800, units=c("px"), bg = "white")
+
+
+
+
+generational_overlap_plots_forpresentation <- 
+  dts_results %>%
+  ggplot(aes(x=as.numeric(growing_zone), y=(test_statistic), colour=year, group=year)) +
+  geom_point(size=4) +
+  geom_smooth(method="lm",show.legend=TRUE, se = FALSE, 
+              size=1, linetype="81")+
+  ylim(0,3)+
+  scale_colour_manual(values=cbPalette)+
+  labs(x="Plant hardiness zone", y="Differences between colour morph 
+phenology", colour="Year")+
+  theme_publish()+
+  theme(text = element_text(size=16), 
+        axis.text = element_text(size=16), 
+        axis.title= element_text(size=20, face="bold"), 
+        legend.text = element_text(size=16), 
+        legend.title = element_text(size=16, face="bold"), 
+        strip.text= element_text(size = 20), 
+        legend.position = c(.85,.85))
+generational_overlap_plots_forpresentation
+
+
+ggsave("figures_for_presentations/dts_plot_linear.jpg", plot=generational_overlap_plots_forpresentation, 
+       width=2500, height=1800, units=c("px"), bg = "white")

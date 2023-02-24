@@ -13,7 +13,7 @@ lapply(pkgs, library, character.only = TRUE)
 rm(pkgs)
 
 
-datakeep = read.csv("~/Work and Career/Fall Webworm/R Code - Post Submission/Fall-Webworm-Repo/mod_data/jarrett_data/ColourData.csv")
+datakeep = read.csv("~/Documents/Work and Career/Fall Webworm/R Code - Post Submission/Fall-Webworm-Repo/mod_data/jarrett_data/ColourData.csv")
 head(datakeep)
 
 datakeep$year <-format(as.Date(datakeep$observed_on, format="%Y-%m-%d"), "%Y")
@@ -150,6 +150,44 @@ linear_plot <- ggplot(data = FinalDF, aes(x = as.numeric(as.character(growing_zo
 linear_plot
 
 ggsave("figures/colour_analysis_linear.pdf", plot=linear_plot, 
+       width=2500, height=1800, units=c("px"), bg = "white")
+
+
+linear_plot_2 <- ggplot(data = FinalDF, aes(x = as.numeric(as.character(growing_zones)), y = LD1, 
+                                          colour = field.colour, linetype=as.character(year)))+
+  #geom_point(aes(colour = field.colour, shape=as.character(year)))+
+  geom_smooth(aes(colour=field.colour), method = "lm", fill = "#000000", 
+              level=0.95, 
+              lwd=1.5, alpha=0.15)+
+  stat_summary(aes(shape=as.character(year), colour=field.colour),
+               fill="black",
+               geom = "point",
+               fun.y = "mean",
+               size = 4, 
+               stroke=1.5)+
+  coord_cartesian(xlim = c(5,9),
+                  ylim = c(-1,2.5))+
+  xlab("Plant hardiness zone")+
+  ylab("Linear discriminant 1")+
+  labs(color="Colour morph", linetype="Year", shape="Mean LD1")+
+  #facet_wrap(vars(year))+
+  #geom_vline(xintercept = 41, linetype = "dotted") +
+  scale_shape_manual(name = "Year", values = c(1, 5, 4))+
+  scale_color_manual(values = c("#000000", "#9C0260"))+
+  scale_fill_manual(values = c("#000000", "#9C0260"))+
+  scale_linetype_manual(values = c("solid", "longdash", "dotdash"))+
+  theme_publish()+
+  theme(text = element_text(size=16), 
+        axis.text = element_text(size=16), 
+        axis.title= element_text(size=20, face="bold"), 
+        legend.text = element_text(size=16), 
+        legend.title = element_text(size=20, face="bold"), 
+        strip.text= element_text(size = 16), 
+        legend.position = c(0.75, 0.90),
+        legend.key.width=unit(2,"cm"))
+linear_plot_2
+
+ggsave("figures_for_presentations/colour_analysis_linear.jpg", plot=linear_plot_2, 
        width=2500, height=1800, units=c("px"), bg = "white")
 
 
