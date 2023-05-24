@@ -7,7 +7,7 @@ rm(list=ls())
 
 #load relevant libraries for script
 pkgs <- c("tidyverse", "raster", "tmap", "terra", "rgdal", "sf", "stars", "smoothr")
-install.packages(pkgs)
+#install.packages(pkgs)
 lapply(pkgs, library, character.only = TRUE)
 rm(pkgs)
 
@@ -115,6 +115,20 @@ zones_tmap_black <- tm_shape(zones_readin)+
             legend.title.color = "white", legend.title.size=0.1, legend.text.size=0.1,legend.position=c("RIGHT", "BOTTOM") )
 zones_tmap_black
 
+#Add vertical line
+extent <- st_bbox(c(xmin = -100, xmax = -100, ymin = 25, ymax = 50), crs = st_crs("+proj=longlat +datum=WGS84"))
+sp_obj <- st_as_sfc(extent)
+sp_line <- st_cast(sp_obj, 'LINESTRING')
+
+line_color <- "black"
+line_width <- 6
+line_style <- "solid"
+
+zones_tmap_black_2 <- zones_tmap_black + 
+  tm_shape(sp_line) +
+  tm_lines(lwd = line_width, col = line_color, lty = line_style)
+zones_tmap_black_2
+
 zones_tmap_red <- tm_shape(zones_readin)+
   tm_raster(palette="-RdYlBu", n=10, alpha=0.7, style="cat", title=
               "Plant Hardiness
@@ -128,7 +142,13 @@ Zone", legend.show=TRUE)+
   tm_legend(legend.outside=FALSE, legend.title.size=2, legend.text.size=1.5,
             legend.frame=TRUE, legend.position=c("right", "bottom"))
 zones_tmap_red
-arrange <- tmap_arrange(zones_tmap_black, zones_tmap_red, ncol=1)
+
+zones_tmap_red_2 <- zones_tmap_red + 
+  tm_shape(sp_line) +
+  tm_lines(lwd = line_width, col = line_color, lty = line_style)
+zones_tmap_red_2
+
+arrange <- tmap_arrange(zones_tmap_black_2, zones_tmap_red_2, ncol=1)
 arrange
 
 
