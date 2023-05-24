@@ -334,8 +334,8 @@ combined_plot_2 <- plot_grid(lat_plot, lon_plot, elev_plot ,ncol = 1, align = "v
                              rel_heights=c(1,1,1.2))
 combined_plot_2
 
-ggsave("figures/lat_lon_elev_distribution.pdf", combined_plot_2, 
-       width=2500, height=1800, units=c("px"))
+ggsave("figures/lat_lon_elev_distribution.tiff", combined_plot_2, 
+       width=2500, height=1800, units=c("px"), bg='white')
 #ggsave("figures/lat_lon_elev_distribution.svg", combined_plot_2, 
       # width=2500, height=1800, units=c("px"))
 

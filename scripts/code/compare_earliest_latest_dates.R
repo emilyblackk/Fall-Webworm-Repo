@@ -315,5 +315,5 @@ combined_plot_2 <- plot_grid(compare_earliest_plot, compare_latest_plot , ncol =
 combined_plot_2
   
 
-ggsave("figures/first_last_date_plot.pdf", combined_plot_2, 
-       width=2500, height=1800, units=c("px"))
+ggsave("figures/first_last_date_plot.tiff", combined_plot_2, 
+       width=2500, height=1800, units=c("px"), bg='white')

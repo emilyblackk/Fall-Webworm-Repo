@@ -152,5 +152,5 @@ arrange <- tmap_arrange(zones_tmap_black_2, zones_tmap_red_2, ncol=1)
 arrange
 
 
-tmap_save(arrange, "figures/colour_morph_distribution.pdf", units="px", width=3000, height=2300)
+tmap_save(arrange, "figures/colour_morph_distribution.tiff", units="px", width=3000, height=2300)
 

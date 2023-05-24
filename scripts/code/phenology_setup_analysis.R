@@ -184,7 +184,7 @@ plot <- abundances_2 %>%
   scale_y_continuous(sec.axis = sec_axis(~ . , name = "Plant hardiness zone", breaks = NULL, labels = NULL), 
                     limits=(-0.05:1), breaks = seq(0, 1, by = 0.5)) +
   scale_color_manual(values = c("black", "#9C0260"))+
-  labs(x="Date", y="Weekly larval abundance (scaled from 0 to 1)", colour="Colour morph")+
+  labs(x="Date", y="Larval abundance (scaled from 0 to 1)", colour="Colour morph")+
   scale_linetype_manual(values=c("solid", "solid"))+
   geom_smooth(aes(colour=colour_morph, linetype=colour_morph 
                   ), method="loess", span=0.05, 
@@ -207,7 +207,7 @@ plot
 
 #export the data
 #write.csv(abundances_2, "mod_data/cleaned_weekly_obs_120222.csv", row.names=FALSE)
-ggsave("figures/abundance_plot.pdf", plot=plot, 
+ggsave("figures/abundance_plot.tiff", plot=plot, 
        width=2500, height=1800, units=c("px"), bg = "white")
 
 
@@ -236,5 +236,5 @@ plot_2 <- abundances_2 %>%
         strip.text= element_text(size = 20), 
         legend.position = c(0.15, 0.95))
 plot_2
-ggsave("figures_for_presentations/phenology_plot.jpg", plot=plot_2, 
+ggsave("figures_for_presentations/phenology_plot.tiff", plot=plot_2, 
        width=2500, height=2500, units=c("px"), bg = "white")

@@ -273,7 +273,7 @@ functions of morphs", colour="Year")+
         strip.text= element_text(size = 14), 
         legend.position = c(.85,.85))
 generational_overlap_plots_3
-ggsave("figures/dts_plot_linear.pdf", plot=generational_overlap_plots_3, 
+ggsave("figures/dts_plot_linear.tiff", plot=generational_overlap_plots_3, 
        width=2500, height=1800, units=c("px"), bg = "white")
 
 
